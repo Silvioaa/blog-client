@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Path } from "../../routes/Routes";
 import { PostsState, CurrentPostState } from "../../routes/PrivateRoutes";
+import NavBar from "../../Components/NavBar";
+import Container from "../../Components/Container";
 import { Link } from "react-router-dom";
 
-const Home = () => {
+const Home = ({history}) => {
 
     const { posts,setPosts } = useContext(PostsState);
+    const { currentPost, setCurrentPost} = useContext(CurrentPostState)
     const path = useContext(Path)
 
 
@@ -13,6 +16,7 @@ const Home = () => {
         e.preventDefault();
         try{
             const clickedId = e.target.parentElement.id;
+            console.log(clickedId)
             fetch(`${path}posts/${clickedId}`,{
                 method:"DELETE"
             })
@@ -30,6 +34,19 @@ const Home = () => {
         }
     }
 
+    async function handleClick(e){
+        try{
+            e.preventDefault();
+            const clickedId=e.target.parentElement.id;
+            await fetch(`${path}posts/${clickedId}`)
+            .then((res)=>res.json())
+            .then((data)=>setCurrentPost(data));
+            history.push(`/detail-edit/${clickedId}`);
+        }catch(error){
+            alert(error)
+        }
+    }
+
     useEffect(()=>{
         fetch("https://jsonplaceholder.typicode.com/posts")
         .then((res)=>res.json())
@@ -37,19 +54,25 @@ const Home = () => {
     },[])
     return(
         <>
-            <h1>Posts</h1>
-            <div className="d-flex flex-column">
-                {
-                    posts.length!==0&&
-                    posts.map((post)=>
-                        <div id={post.id} key={post.id}>
-                            {post.title}
-                            <button onClick={deletePost}>Borrar post</button>
-                            <Link to={`detail/${post.id}`}>Ver detalle</Link>
-                        </div>
-                    )
-                }
-            </div>
+            <NavBar/>
+            <Container>
+                <h1 className="display-5 mb-5">Posts</h1>
+                <div className="d-flex flex-column">
+                    {
+                        posts.length!==0&&
+                        posts.map((post)=>
+                            <div className="text-bloc d-flex flex-column card-body" key={post.id}>
+                                <h3 className="text-bloc">{post.title}</h3>
+                                <div id={post.id} className="d-flex">
+                                    <Link className="btn btn-outline-primary" to={`detail/${post.id}`}>Ver detalle</Link>
+                                    <button className="btn btn-outline-primary ms-2" onClick={deletePost}>Borrar post</button>
+                                    <a className="btn btn-outline-primary ms-2" onClick={handleClick}>Editar post</a>
+                                </div>
+                            </div>
+                        )
+                    }
+                </div>
+            </Container>
     
         </>
     )

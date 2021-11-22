@@ -29,7 +29,7 @@ const NavBar = ({section}) => {
                             <Link className={`nav-link ${activeHome}`} to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${activeSearch}`} to="/search">Búsqueda</Link>
+                            <Link className={`nav-link ${activeSearch}`} to="/detail-create">Crear Post</Link>
                         </li>
                     </ul>
                 </div>
